@@ -3,9 +3,9 @@ name: Scheduler via GH
 on:
   Scheduler:
     -cron:'*/2 * * * *'
-    branches:
-      - main
-  workflow_dispatch:
+    #branches:
+    #  - main
+  #workflow_dispatch:
 
 jobs:
   echo-job:
@@ -15,3 +15,4 @@ jobs:
         run: |
           echo " Hi I am running this simple code to test basic block of GH action in RS id i.e. arjun.sahi@rackspace.com with Scheduler in every 2 min"
           echo "Workflow executed successfully"
+          echo "Current time is $(date)"
