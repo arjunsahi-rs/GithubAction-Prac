@@ -1,4 +1,4 @@
-name: Simple Echo Workflow
+name: just print
 
 on:
   push:
@@ -12,5 +12,5 @@ jobs:
     steps:
       - name: Print message
         run: |
-          echo "Hello from GitHub Actions!"
-          echo "Workflow executed successfully 🚀"
+          echo " Hi I am running this simple code to test basic block of GH action in RS id i.e. arjun.sahi@rackspace.com"
+          echo "Workflow executed successfully"
