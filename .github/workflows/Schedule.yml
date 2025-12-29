@@ -2,7 +2,7 @@ name: Scheduler via GH
 
 on:
   schedule:
-    - cron: '*/2 * * * *'
+    - cron: '*/5 * * * *' #because it will not sypport less than 5 I tried for 2 min also
   workflow_dispatch:
 
 jobs:
