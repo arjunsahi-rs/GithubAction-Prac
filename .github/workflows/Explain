@@ -1,0 +1,35 @@
+# Basic Outline how code shoulf be 
+# Name of the workflow (you will see this in the GitHub Actions tab)
+name: Simple GitHub Action Example
+
+# This tells GitHub when to run the workflow
+on:
+  # Run this workflow whenever code is pushed to the repository
+  push:
+
+# A workflow is made up of one or more jobs
+jobs:
+  # This is the job ID (can be any name)
+  say-hello:
+
+    # The type of virtual machine to run the job on
+    runs-on: ubuntu-latest
+
+    # A job is made up of steps
+    steps:
+
+      # Step 1: Checkout (download) your repository code
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2: Run a simple command
+      - name: Print a hello message
+        run: echo "Hello! This GitHub Action is working "
+
+      # Step 3: Run multiple commands
+      - name: Show system information
+        run: |
+          echo "The current date is:"
+          date
+          echo "The current directory is:"
+          pwd
