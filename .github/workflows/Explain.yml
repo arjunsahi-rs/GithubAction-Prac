@@ -1,4 +1,4 @@
-# =========================
+# =========================ths
 # WORKFLOW NAME
 # =========================
 # This is the name of the workflow.
@@ -55,7 +55,7 @@ jobs:
       # This step runs a shell command.
       # "run" is used to execute commands.
       - name: Print a message       # Step name shown in logs
-        run: echo "Hello! GitHub Action is running 🚀"
+        run: echo "Hello! GitHub Action is running by Arjun Sahi"
 
       # =========================
       # STEP 3
