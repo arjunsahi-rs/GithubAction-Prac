@@ -1,35 +1,70 @@
-# Basic Outline how code shoulf be 
-# Name of the workflow (you will see this in the GitHub Actions tab)
+# =========================
+# WORKFLOW NAME
+# =========================
+# This is the name of the workflow.
+# You will see this name in the GitHub "Actions" tab.
 name: Simple GitHub Action Example
 
-# This tells GitHub when to run the workflow
+# =========================
+# TRIGGER / EVENT
+# =========================
+# "on" defines WHEN this workflow should run.
+# "push" is the EVENT.
+# This means: run this workflow whenever code is pushed to the repository.
 on:
-  # Run this workflow whenever code is pushed to the repository
   push:
 
-# A workflow is made up of one or more jobs
+# =========================
+# JOBS SECTION
+# =========================
+# A workflow can have one or more jobs.
 jobs:
-  # This is the job ID (can be any name)
+
+  # -------------------------
+  # JOB NAME / JOB ID
+  # -------------------------
+  # This is the job name (ID).
+  # It can be anything, but no spaces are allowed.
   say-hello:
 
-    # The type of virtual machine to run the job on
+    # -------------------------
+    # RUNNER / MACHINE
+    # -------------------------
+    # This tells GitHub which virtual machine to use.
+    # "ubuntu-latest" is a Linux machine provided by GitHub.
     runs-on: ubuntu-latest
 
-    # A job is made up of steps
+    # -------------------------
+    # STEPS SECTION
+    # -------------------------
+    # A job is made up of steps.
+    # Steps run one after another.
     steps:
 
-      # Step 1: Checkout (download) your repository code
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      # =========================
+      # STEP 1
+      # =========================
+      # This step downloads (checks out) your repository code
+      # into the virtual machine.
+      - name: Checkout repository   # This is the STEP NAME
+        uses: actions/checkout@v4   # This uses a pre-built GitHub Action
 
-      # Step 2: Run a simple command
-      - name: Print a hello message
-        run: echo "Hello! This GitHub Action is working "
+      # =========================
+      # STEP 2
+      # =========================
+      # This step runs a shell command.
+      # "run" is used to execute commands.
+      - name: Print a message       # Step name shown in logs
+        run: echo "Hello! GitHub Action is running 🚀"
 
-      # Step 3: Run multiple commands
-      - name: Show system information
+      # =========================
+      # STEP 3
+      # =========================
+      # This step runs multiple commands.
+      # The "|" symbol allows multiple lines.
+      - name: Show system details
         run: |
-          echo "The current date is:"
+          echo "Today's date is:"
           date
-          echo "The current directory is:"
+          echo "Current folder path:"
           pwd
