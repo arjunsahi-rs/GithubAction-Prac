@@ -1,0 +1,40 @@
+name: Multi-Event CI Workflow
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Environment to run against"
+        required: false
+        default: "dev"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Display event info
+        run: |
+          echo "Triggered by event: ${{ github.event_name }}"
+          echo "Branch: ${{ github.ref }}"
+
+      - name: Run build steps
+        run: |
+          echo "Running build..."
+          # add your build/test commands here
+
+      - name: Conditional step for workflow_dispatch
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          echo "Manual run for environment: ${{ github.event.inputs.environment }}"
