@@ -1,0 +1,26 @@
+name: Manual Dispatch With Choice Input
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Select environment"
+        required: true
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Show selected environment
+        run: |
+          echo "Selected environment: ${{ github.event.inputs.environment }}"
+
+      - name: Deploy step
+        run: |
+          echo "Deploying to ${{ github.event.inputs.environment }}"
