@@ -1,0 +1,17 @@
+name: Repository Dispatch Example
+
+on:
+  repository_dispatch:
+    types: [custom-event]
+
+jobs:
+  webhook-job:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Print GitHub event info
+        run: |
+          echo "Event name: ${{ github.event_name }}"
+          echo "Action type: ${{ github.event.action }}"
+          echo "Client payload:"
+          echo '${{ toJson(github.event.client_payload) }}'
