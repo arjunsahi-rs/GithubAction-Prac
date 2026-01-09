@@ -1,4 +1,4 @@
-#test 
+#test push
 name: Multi-Event CI Workflow
 
 on:
