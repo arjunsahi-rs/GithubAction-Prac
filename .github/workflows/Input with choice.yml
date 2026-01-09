@@ -11,6 +11,8 @@ on:
           - dev
           - staging
           - prod
+          - aadi-test-env
+          - varsha-test-env
 
 jobs:
   deploy:
