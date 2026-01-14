@@ -21,21 +21,25 @@ jobs:
           ALLOWED_REVIEWERS: "arjunsahi-rs"
           REPOS_LIST: ${{ github.event.inputs.REPOS }}
         run: |
+          echo "Starting validation for multiple repositories..."
           IFS=',' read -ra REPOS <<< "$REPOS_LIST"
+
+          INVALID_FOUND_OVERALL=false
 
           for REPO in "${REPOS[@]}"; do
             echo "-----------------------------------------"
             echo "Checking repo: $REPO"
+            
             RESPONSE=$(curl -s -H "Authorization: Bearer $GH_TOKEN" \
               -H "Accept: application/vnd.github+json" \
-              https://api.github.com/repos/$OWNER/$REPO/environments/$ENV_NAME)
+              "https://api.github.com/repos/$OWNER/$REPO/environments/$ENV_NAME")
 
-            REVIEWERS=$(echo "$RESPONSE" | jq -r '.protection_rules[]? 
-              | select(.type=="required_reviewers") 
-              | .reviewers[]?.reviewer.login')
+            # Extract reviewers using single-line jq
+            REVIEWERS=$(echo "$RESPONSE" | jq -r '.protection_rules[]? | select(.type=="required_reviewers") | .reviewers[]?.reviewer.login')
 
             if [ -z "$REVIEWERS" ]; then
               echo "❌ No reviewers configured for environment $ENV_NAME in $REPO"
+              INVALID_FOUND_OVERALL=true
               continue
             fi
 
@@ -43,9 +47,7 @@ jobs:
             echo "$REVIEWERS"
 
             IFS=',' read -ra ALLOWED <<< "$ALLOWED_REVIEWERS"
-
             INVALID_FOUND=false
 
             for reviewer in $REVIEWERS; do
               if [[ ! " ${ALLOWED[*]} " =~ " ${reviewer} " ]]; then
-                echo
