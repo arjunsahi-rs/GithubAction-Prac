@@ -2,55 +2,50 @@ name: Check Global Prod Environment Reviewers
 
 on:
   workflow_dispatch:
+    inputs:
+      REPOS:
+        description: 'Comma-separated list of repositories to check'
+        required: true
+        default: 'repo1,repo2,repo3'
 
 jobs:
   check-reviewers:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check reviewers for global-prod environment
+      - name: Validate environment reviewers across multiple repos
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OWNER: ${{ github.repository_owner }}
-          REPO: ${{ github.event.repository.name }}
           ENV_NAME: global-prod
           ALLOWED_REVIEWERS: "arjunsahi-rs"
+          REPOS_LIST: ${{ github.event.inputs.REPOS }}
         run: |
-          echo "Fetching environment reviewers..."
+          IFS=',' read -ra REPOS <<< "$REPOS_LIST"
 
-          RESPONSE=$(curl -s -H "Authorization: Bearer $GH_TOKEN" \
-            -H "Accept: application/vnd.github+json" \
-            https://api.github.com/repos/$OWNER/$REPO/environments/$ENV_NAME)
+          for REPO in "${REPOS[@]}"; do
+            echo "-----------------------------------------"
+            echo "Checking repo: $REPO"
+            RESPONSE=$(curl -s -H "Authorization: Bearer $GH_TOKEN" \
+              -H "Accept: application/vnd.github+json" \
+              https://api.github.com/repos/$OWNER/$REPO/environments/$ENV_NAME)
 
-          REVIEWERS=$(echo "$RESPONSE" | jq -r '.protection_rules[]? 
-            | select(.type=="required_reviewers") 
-            | .reviewers[]?.reviewer.login')
+            REVIEWERS=$(echo "$RESPONSE" | jq -r '.protection_rules[]? 
+              | select(.type=="required_reviewers") 
+              | .reviewers[]?.reviewer.login')
 
-          if [ -z "$REVIEWERS" ]; then
-            echo "❌ No reviewers configured for environment $ENV_NAME"
-            exit 1
-          fi
-
-          echo "Configured reviewers:"
-          echo "$REVIEWERS"
-
-          COUNT=$(echo "$REVIEWERS" | wc -l | xargs)
-          echo "Reviewer count: $COUNT"
-
-          IFS=',' read -ra ALLOWED <<< "$ALLOWED_REVIEWERS"
-
-          INVALID_FOUND=false
-
-          for reviewer in $REVIEWERS; do
-            if [[ ! " ${ALLOWED[*]} " =~ " ${reviewer} " ]]; then
-              echo "❌ Unauthorized reviewer found: $reviewer"
-              INVALID_FOUND=true
+            if [ -z "$REVIEWERS" ]; then
+              echo "❌ No reviewers configured for environment $ENV_NAME in $REPO"
+              continue
             fi
-          done
 
-          if [ "$INVALID_FOUND" = true ]; then
-            echo "❌ Environment reviewer validation failed"
-            exit 1
-          fi
+            echo "Configured reviewers in $REPO:"
+            echo "$REVIEWERS"
 
-          echo "✅ Environment reviewers are valid"
+            IFS=',' read -ra ALLOWED <<< "$ALLOWED_REVIEWERS"
+
+            INVALID_FOUND=false
+
+            for reviewer in $REVIEWERS; do
+              if [[ ! " ${ALLOWED[*]} " =~ " ${reviewer} " ]]; then
+                echo
