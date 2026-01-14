@@ -6,7 +6,7 @@ on:
       REPOS:
         description: 'Comma-separated list of repositories to check'
         required: true
-        default: 'repo1,repo2,repo3'
+        default: 'Reviewer_test_repo2,Reviewer_test_repo1,GithubAction-Prac'
 
 jobs:
   check-reviewers:
