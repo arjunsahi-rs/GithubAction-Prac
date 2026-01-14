@@ -22,6 +22,7 @@ jobs:
           REPOS_LIST: ${{ github.event.inputs.REPOS }}
         run: |
           echo "Starting validation for multiple repositories..."
+          # Split comma-separated list into array
           IFS=',' read -ra REPOS <<< "$REPOS_LIST"
 
           INVALID_FOUND_OVERALL=false
@@ -29,12 +30,12 @@ jobs:
           for REPO in "${REPOS[@]}"; do
             echo "-----------------------------------------"
             echo "Checking repo: $REPO"
-            
+
             RESPONSE=$(curl -s -H "Authorization: Bearer $GH_TOKEN" \
               -H "Accept: application/vnd.github+json" \
               "https://api.github.com/repos/$OWNER/$REPO/environments/$ENV_NAME")
 
-            # Extract reviewers using single-line jq
+            # Single-line jq command to extract reviewers
             REVIEWERS=$(echo "$RESPONSE" | jq -r '.protection_rules[]? | select(.type=="required_reviewers") | .reviewers[]?.reviewer.login')
 
             if [ -z "$REVIEWERS" ]; then
@@ -51,3 +52,25 @@ jobs:
 
             for reviewer in $REVIEWERS; do
               if [[ ! " ${ALLOWED[*]} " =~ " ${reviewer} " ]]; then
+                echo "❌ Unauthorized reviewer found in $REPO: $reviewer"
+                INVALID_FOUND=true
+                INVALID_FOUND_OVERALL=true
+              fi
+            done
+
+            if [ "$INVALID_FOUND" = true ]; then
+              echo "❌ Environment reviewer validation failed for $REPO"
+            else
+              echo "✅ Environment reviewers are valid for $REPO"
+            fi
+
+          done  # <-- Make sure for loop is closed
+
+          echo "-----------------------------------------"
+
+          if [ "$INVALID_FOUND_OVERALL" = true ]; then
+            echo "❌ One or more repositories failed reviewer validation"
+            exit 1
+          else
+            echo "✅ All repositories passed reviewer validation"
+          fi
